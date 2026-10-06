@@ -4,27 +4,29 @@ public class PriorityQueue<T> {
     private int[] priorities;
     private int size;
 
+    // Time Complexity: O(1)
     @SuppressWarnings("unchecked")
     public PriorityQueue(int arraySize) {
+        if (arraySize < 1) {
+            arraySize = 1;
+        }
         items = (T[]) new Object[arraySize];
         priorities = new int[arraySize];
         size = 0;
     }
 
-    // Time Complexity: O(n)
+    // Time Complexity: O(n) (shifts lower-priority items to make room)
     public void insert(T newItem, int priorityValue) {
-
         if (size == items.length) {
             resize();
         }
 
+        // Shift items with priority value <= the new one toward the end, so
+        // the new item lands before equal-priority items (older ones leave first).
         int position = size;
-        while (position > 0 &&
-               priorities[position - 1] > priorityValue) {
-
+        while (position > 0 && priorities[position - 1] <= priorityValue) {
             items[position] = items[position - 1];
             priorities[position] = priorities[position - 1];
-
             position--;
         }
 
@@ -33,22 +35,14 @@ public class PriorityQueue<T> {
         size++;
     }
 
-    // Time Complexity: O(n) because remaining items are shifted.
+    // Time Complexity: O(1)
     public T remove() {
         if (size == 0) {
             return null;
         }
-
-        T item = items[0];
-
-        for (int i = 0; i < size - 1; i++) {
-            items[i] = items[i + 1];
-            priorities[i] = priorities[i + 1];
-        }
-
+        T item = items[size - 1];
         items[size - 1] = null;
         size--;
-
         return item;
     }
 
@@ -57,7 +51,7 @@ public class PriorityQueue<T> {
         if (size == 0) {
             return null;
         }
-        return items[0];
+        return items[size - 1]; // highest priority
     }
 
     // Time Complexity: O(1)
@@ -65,24 +59,23 @@ public class PriorityQueue<T> {
         if (size == 0) {
             return null;
         }
-
-        return items[size - 1];
+        return items[0]; // lowest priority
     }
 
     // Time Complexity: O(n)
     @Override
     public String toString() {
-        String result = "";
+        StringBuilder result = new StringBuilder();
 
-        for (int i = 0; i < size; i++) {
-            result += items[i] + "(" + priorities[i] + ")";
-
-            if (i < size - 1) {
-                result += " ";
+        // print from front (highest priority) to rear (lowest priority)
+        for (int i = size - 1; i >= 0; i--) {
+            result.append(items[i]).append("(").append(priorities[i]).append(")");
+            if (i > 0) {
+                result.append(" ");
             }
         }
 
-        return result;
+        return result.toString();
     }
 
     // Time Complexity: O(n)
@@ -105,4 +98,3 @@ public class PriorityQueue<T> {
         priorities = newPriorities;
     }
 }
-    
